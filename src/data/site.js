@@ -1,14 +1,14 @@
-
-// Update these values with your own contact details and project screenshots.
+import lostFoundImage from "../assets/lostandfoundportal.jpg";
+import portfolioImage from "../assets/portfolio.jpg";
 
 export const site = {
   name: "Prashant Singh",
   role: "Web Developer + UI/UX Designer",
-  email: "singhhouse843@gmial.com",
+  email: "singhhouse843@gmail.com",
   socials: [
     { label: "LinkedIn", url: "" },
     { label: "GitHub", url: "" },
-    { label: "Instagram", url: "noor___ka___jharna" },
+    { label: "Instagram", url: "https://instagram.com/noor__ka__jharna" },
   ],
 };
 
@@ -19,7 +19,7 @@ export const projects = [
     description:
       "A web-based platform designed to help students report, discover and manage lost and found items.",
     category: "WEB DEVELOPMENT",
-    image: "/src/assets/lostandfoundportal.jpg",
+    image: lostFoundImage,
   },
   {
     number: "02",
@@ -27,7 +27,7 @@ export const projects = [
     description:
       "A creative portfolio focused on modern UI, strong typography and engaging digital experiences.",
     category: "DESIGN + DEVELOPMENT",
-    image: "/src/assets/portfolio.jpg",
+    image: portfolioImage,
   },
 ];
 
