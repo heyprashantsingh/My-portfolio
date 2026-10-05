@@ -1,0 +1,627 @@
+/* =========================================================
+   cinematic.css — loaded AFTER App.css (see main.jsx)
+   Depth / z-index system (single source of truth):
+     -1  video + shade           (.site-background)
+      0  ambient particles       (.fx-canvas)
+      1  sections, footer        (--z-section, DOM order = stacking order)
+     30  navbar
+     40  cursor light
+     60  hero particle moment    (.fx-canvas.is-front)
+   ========================================================= */
+
+:root {
+  --red: #ff3b3b;
+  --z-bg: -1;
+  --z-ambient: 0;
+  --z-section: 1;
+  --z-nav: 30;
+  --z-light: 40;
+  --z-fx: 60;
+}
+
+/* Anchor scrolling is handled by GSAP (pinned sections break native jumps). */
+html {
+  scroll-behavior: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Hidden before React runs; App.jsx takes over and removes the class. */
+html.is-intro .navbar,
+html.is-intro #page-content,
+html.is-intro .footer {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- background video as a 3D object ---------- */
+
+.site-background {
+  z-index: var(--z-bg);
+}
+
+.site-background__stage,
+.site-background__frame {
+  position: absolute;
+  inset: 0;
+}
+
+.site-background__stage {
+  will-change: transform;
+}
+
+.site-background__frame {
+  overflow: hidden;
+  will-change: transform, filter;
+}
+
+.site-background__video {
+  inset: -3%;
+  width: 106%;
+  height: 106%;
+  opacity: .56;
+  will-change: transform;
+}
+
+.site-background__flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(40, 120, 120, .55),
+      rgba(5, 35, 38, .85)
+    );
+}
+
+/* ---------- particles canvas ---------- */
+
+.fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: var(--z-ambient);
+}
+
+.fx-canvas.is-front {
+  z-index: var(--z-fx);
+}
+
+/* ---------- stacking sheets ---------- */
+
+.navbar {
+  z-index: var(--z-nav);
+}
+
+.page-section {
+  z-index: var(--z-section);
+  isolation: isolate;
+}
+
+.page-section::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  border-top: 1px solid rgba(243, 243, 238, .14);
+  border-radius: 36px 36px 0 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 13, 12, .9),
+      rgba(8, 10, 9, .94)
+    );
+  box-shadow: 0 -40px 90px rgba(0, 0, 0, .45);
+  pointer-events: none;
+}
+
+.hero::before {
+  display: none;
+}
+
+/* hero stays transparent: the video is its stage */
+
+.footer {
+  position: relative;
+  z-index: var(--z-section);
+  isolation: isolate;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  background: rgba(8, 10, 9, .94);
+  pointer-events: none;
+}
+
+.hero__content {
+  will-change: transform;
+}
+
+/* ---------- navbar brand ---------- */
+
+.navbar__brand {
+  gap: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  transform-origin: left center;
+  transition:
+    letter-spacing .35s ease,
+    transform .35s ease,
+    text-shadow .35s ease,
+    color .3s ease;
+}
+
+.navbar__name b {
+  color: var(--red);
+  font-weight: 800;
+  transition: text-shadow .35s ease;
+}
+
+.navbar__monogram {
+  width: 36px;
+  height: 36px;
+  border-color: var(--red);
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 700;
+  transition:
+    background .3s ease,
+    color .3s ease,
+    box-shadow .35s ease;
+}
+
+.navbar__brand:hover {
+  letter-spacing: .16em;
+  transform: scale(1.03);
+}
+
+.navbar__brand:hover .navbar__name b {
+  text-shadow: 0 0 18px rgba(255, 59, 59, .65);
+}
+
+.navbar__brand:hover .navbar__monogram {
+  background: var(--red);
+  color: var(--ink);
+  box-shadow: 0 0 22px rgba(255, 59, 59, .45);
+}
+
+/* ---------- buttons (gsap owns transform, so CSS only transitions colors/glow) ---------- */
+
+.button {
+  transition:
+    color .24s ease,
+    background .24s ease,
+    border-color .24s ease,
+    box-shadow .3s ease;
+  will-change: transform;
+}
+
+.button:hover {
+  transform: none;
+  box-shadow:
+    0 0 0 1px rgba(213, 255, 112, .25),
+    0 10px 40px rgba(213, 255, 112, .14);
+}
+
+.button--text:hover {
+  box-shadow: none;
+}
+
+.navbar__links .navbar__contact {
+  transition:
+    color .24s ease,
+    border-color .24s ease,
+    box-shadow .3s ease;
+}
+
+.navbar__links .navbar__contact:hover {
+  border-color: var(--lime);
+  box-shadow: 0 0 24px rgba(213, 255, 112, .15);
+}
+
+@media (hover: none) {
+  .button:active {
+    transform: scale(.96);
+    transition: transform .12s ease;
+  }
+}
+
+/* ---------- glass, used selectively ---------- */
+
+.code-studio,
+.shared-code {
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+
+/* ---------- select-to-grow lists ---------- */
+
+.skill-row,
+.service-item {
+  position: relative;
+}
+
+.skill-row__name,
+.service-item h3 {
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+.skill-row.is-selected .skill-row__name,
+.service-item.is-selected h3 {
+  color: var(--lime);
+  text-shadow: 0 0 30px rgba(213, 255, 112, .35);
+}
+
+.skill-row.is-selected .skill-row__arrow,
+.service-item.is-selected .service-item__arrow {
+  opacity: 1;
+  transform: translate(0);
+}
+
+.skill-row::after,
+.service-item::after,
+.journey-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+
+  background:
+    radial-gradient(
+      220px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(213, 255, 112, .1),
+      transparent 70%
+    );
+}
+
+.skill-row:hover::after,
+.service-item:hover::after,
+.journey-item:hover::after,
+.skill-row.is-selected::after,
+.service-item.is-selected::after {
+  opacity: 1;
+}
+
+.journey-item {
+  position: relative;
+}
+
+/* ---------- project cards ---------- */
+
+.project-card__visual {
+  border: 1px solid transparent;
+  will-change: transform;
+  transition:
+    border-color .4s ease,
+    box-shadow .4s ease;
+}
+
+.project-card:hover .project-card__visual {
+  border-color: rgba(213, 255, 112, .35);
+  box-shadow:
+    0 0 40px rgba(213, 255, 112, .1),
+    0 30px 80px rgba(0, 0, 0, .35);
+}
+
+.project-card__visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+
+  background:
+    radial-gradient(
+      320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(213, 255, 112, .18),
+      transparent 60%
+    );
+}
+
+.project-card:hover .project-card__visual::after {
+  opacity: 1;
+}
+
+/* ---------- cursor light (desktop mouse only) ---------- */
+
+.cursor-light {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-light);
+
+  width: 420px;
+  height: 420px;
+
+  margin: -210px 0 0 -210px;
+
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(213, 255, 112, .09),
+      transparent 62%
+    );
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-light {
+    display: none;
+  }
+}
+
+/* ---------- flowers (About) ---------- */
+
+.flowers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.about > :not(.flowers) {
+  position: relative;
+  z-index: 1;
+}
+
+.flower {
+  position: absolute;
+  width: var(--size);
+  aspect-ratio: 1;
+  will-change: transform, opacity;
+}
+
+.flower__float,
+.flower__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.flower__svg {
+  opacity: .42;
+}
+
+.flower--a {
+  --size: clamp(190px, 27vw, 400px);
+  top: 6%;
+  right: -5%;
+  color: var(--lime);
+}
+
+.flower--b {
+  --size: clamp(130px, 17vw, 260px);
+  bottom: 4%;
+  left: -5%;
+  color: #a4c28e;
+}
+
+.flower--c {
+  --size: clamp(70px, 8vw, 120px);
+  right: 24%;
+  bottom: 10%;
+  color: var(--paper);
+}
+/* =========================================================
+   3D STAR GAZING / HYPERSPACE
+   ---------------------------------------------------------
+   Hero untouched.
+   Stars activate from the About section onward.
+
+   FAR  -> deep background
+   MID  -> medium depth
+   NEAR -> close depth
+
+   GSAP controls the actual 3D movement.
+   Lightweight version to avoid rendering lag.
+========================================================= */
+
+.star-gazing {
+  position: fixed;
+  inset: 0;
+
+  z-index: var(--z-ambient);
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+  pointer-events: none;
+
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+
+  transform-style: preserve-3d;
+
+  opacity: 0;
+
+  mix-blend-mode: screen;
+
+  /* Keep the browser's paint area controlled */
+  contain: layout paint;
+}
+
+
+/* =========================================================
+   STAR LAYERS
+========================================================= */
+
+.star-gazing__layer {
+  position: absolute;
+
+  inset: -20%;
+
+  width: 140%;
+  height: 140%;
+
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+
+  background-repeat: repeat;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+
+/* =========================================================
+   FAR STAR LAYER
+   Very small + slow depth
+========================================================= */
+
+.star-gazing__layer--far {
+  opacity: 0.20;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.65) 0 1px,
+      transparent 1.5px
+    );
+
+  background-size: 190px 190px;
+
+  background-position: 20px 30px;
+
+  transform:
+    translate3d(0, 0, -450px)
+    scale(0.78);
+}
+
+
+/* =========================================================
+   MID STAR LAYER
+========================================================= */
+
+.star-gazing__layer--mid {
+  opacity: 0.30;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.78) 0 1px,
+      transparent 1.7px
+    );
+
+  background-size: 125px 125px;
+
+  background-position: 50px 70px;
+
+  transform:
+    translate3d(0, 0, -200px)
+    scale(0.88);
+}
+
+
+/* =========================================================
+   NEAR STAR LAYER
+   Closest layer = strongest hyperspace sensation
+========================================================= */
+
+.star-gazing__layer--near {
+  opacity: 0.42;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.90) 0 1.2px,
+      transparent 2px
+    );
+
+  background-size: 82px 82px;
+
+  background-position: 15px 40px;
+
+  transform:
+    translate3d(0, 0, 0)
+    scale(1);
+}
+
+
+/* =========================================================
+   CINEMATIC CENTER DEPTH
+========================================================= */
+
+.star-gazing::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      transparent 42%,
+      rgba(5, 8, 7, 0.18) 75%,
+      rgba(5, 8, 7, 0.45) 100%
+    );
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 760px) {
+
+  .star-gazing {
+    perspective: 700px;
+  }
+
+  .star-gazing__layer {
+    inset: -10%;
+
+    width: 120%;
+    height: 120%;
+  }
+
+  .star-gazing__layer--far {
+    opacity: 0.12;
+  }
+
+  .star-gazing__layer--mid {
+    opacity: 0.18;
+  }
+
+  .star-gazing__layer--near {
+    opacity: 0.24;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .star-gazing {
+    display: none;
+  }
+}
